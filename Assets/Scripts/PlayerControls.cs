@@ -5,6 +5,7 @@ public class PlayerControls : MonoBehaviour
 {
     private InputAction _moveAction;
     private InputAction _jumpAction;
+    private InputAction _sprintAction;
     [SerializeField] CharacterController controller;
     [SerializeField] private float moveSpeed = 5f;
     [SerializeField] private float jumpHeight = 3f;
@@ -19,6 +20,7 @@ public class PlayerControls : MonoBehaviour
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
+        _sprintAction = InputSystem.actions.FindAction("Sprint");
         _moveAction = InputSystem.actions.FindAction("Move");
         _jumpAction = InputSystem.actions.FindAction("Jump");
     }
@@ -35,6 +37,10 @@ public class PlayerControls : MonoBehaviour
         
         Vector3 moveValue = _moveAction.ReadValue<Vector2>();
         
+        if (_sprintAction.IsPressed())
+        {
+            moveValue *= 2;
+        }
         Vector3 move = transform.right * moveValue.x + transform.forward * moveValue.y;
         controller.Move(move * (moveSpeed * Time.deltaTime));
         
