@@ -4,7 +4,7 @@ using UnityEngine.Events;
 using UnityEngine.Serialization;
 using Vector3 = UnityEngine.Vector3;
 
-public class PlayerObjectHolder : MonoBehaviour
+public class HandObjectHolder : MonoBehaviour
 {
     // Apply a force to a clicked rigidbody object.
 
@@ -32,33 +32,72 @@ public class PlayerObjectHolder : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.E) && isRightHandHoldingAnything)
         {
             DropObject();
-            
         }
+        
+        if (Input.GetKeyDown(KeyCode.R) && isRightHandHoldingAnything)
+        {
+            InteractWithObject();
+        }
+        
+        
         if (Input.GetMouseButtonDown(0))
         {
-            RaycastHit hit;
-            Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+            TryPickupObject();
+        }
+    }
 
-            if (Physics.Raycast(ray, out hit))
+    private void TryPickupObject()
+    {
+        if (!isRightHandHoldingAnything)
+        {
+            PickupObject();
+        }
+    }
+
+    private void InteractWithObject()
+    {
+        RaycastHit hit;
+        Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+
+        Physics.Raycast(ray, out hit);
+
+        if (TryGetComponent(typeof(Tool), out var tool))
+        {
+            
+        }
+            
+                // hit.transform.GetComponent<WorkAbleObjects>();
+            
+            // case 
+        
+    }
+    
+    private void PickupObject()
+    {
+        RaycastHit hit;
+        Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+
+        if (Physics.Raycast(ray, out hit))
+        {
+            if (hit.rigidbody !=null && isRightHandHoldingAnything == false) // TODO fix nesting
             {
-                if (hit.rigidbody !=null && isRightHandHoldingAnything == false) // TODO fix nesting
-                {
-                    _heldObject = hit.transform.gameObject;
-                    _heldObjectRigidbody = _heldObject.GetComponent<Rigidbody>();
+                _heldObject = hit.transform.gameObject;
+                _heldObjectRigidbody = _heldObject.GetComponent<Rigidbody>();
                     
-                    // hit.transform.parent = _camera.transform;
-                    isRightHandHoldingAnything = true;
-                    _heldObject.transform.SetParent(_rightHand.transform);
-                    _heldObjectRigidbody.isKinematic= true;
-                    _heldObject.transform.localPosition = Vector3.zero;
-                    isRightHandHoldingAnything = true;
+                // hit.transform.parent = _camera.transform;
+                isRightHandHoldingAnything = true;
+                _heldObject.transform.SetParent(_rightHand.transform);
+                _heldObjectRigidbody.isKinematic= true;
+                _heldObject.transform.localPosition = Vector3.zero;
+                isRightHandHoldingAnything = true;
                     
-                    Debug.DrawRay(transform.position, ray.direction, Color.red, 1f);
-                    // hit.rigidbody.AddForce(ray.direction * _throwForce);
-                }
+                Debug.DrawRay(transform.position, ray.direction, Color.red, 1f);
+                // hit.rigidbody.AddForce(ray.direction * _throwForce);
             }
         }
     }
+    
+    
 
     public void DropObject()
     {
@@ -78,6 +117,7 @@ public class PlayerObjectHolder : MonoBehaviour
         _heldObject.transform.SetParent(null);
         isRightHandHoldingAnything = false;
     }
+    
 
     public void RayTester()
     {
